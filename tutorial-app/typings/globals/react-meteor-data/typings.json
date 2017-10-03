@@ -1,0 +1,11 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/meteor-typings/react-meteor-data/955e4521623d6574dde8e0ed1b29967ec13f2c9d/typings.json",
+    "raw": "github:meteor-typings/react-meteor-data#955e4521623d6574dde8e0ed1b29967ec13f2c9d",
+    "main": "main.d.ts",
+    "version": "0.2.9",
+    "global": true,
+    "name": "react-meteor-data"
+  }
+}
