@@ -15,13 +15,13 @@ $ meteor create app-name
 // 1. install npm react package
 $ meteor npm install --save react react-dom @types/react @types/react-dom
 
-// 2. install typescript typings
+// 2. install typescript typings
 $ npm install -g typescript
 $ npm install -g typings
 
 // 3. typings install type definition
-$ typings install registry:env/meteor--global
-$ typings install github:meteor-typings/react-meteor-data#955e4521623d6574dde8e0ed1b29967ec13f2c9d --global
+$ typings install registry:env/meteor --global
+$ typings install github:meteor-typings/react-meteor-data --global
 $ typings install react
 $ typings install react-dom
 
