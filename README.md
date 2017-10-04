@@ -30,7 +30,8 @@ $ meteor add meteortypescript:compiler
 ```
 
 ### Replace Code
-```client/hello.tsx
+client/hello.tsx
+```
 import * as React from "react";
 import { Meteor } from "meteor/meteor"
 import { render } from "react-dom";
@@ -49,7 +50,8 @@ Meteor.startup(() => {
   render(<Hello />, document.getElementById('render-target'));
 });
 ```
-```client/main.html
+client/main.html
+```
 <head>
   <title>Sample App</title>
 </head>
