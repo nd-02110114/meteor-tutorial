@@ -6,7 +6,7 @@ import Task from './Task';
 import { Tasks } from '../api/tasks';
 
 interface TasksPropType {
- tasks: { _id: number; text: string; }[];
+ tasks: { _id: string; text: string; checked: boolean; }[];
 }
  
 // App component - represents the whole app
