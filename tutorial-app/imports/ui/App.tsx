@@ -20,7 +20,8 @@ class App extends React.Component<TasksPropType,{}> {
     // insert Database
     Tasks.insert({
       text,
-      createdAt: new Date(), // current time
+      createdAt: new Date(),
+      checked: false, 
     });
     // Clear form
     this.textInput.value = '';
