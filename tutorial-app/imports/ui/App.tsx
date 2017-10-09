@@ -1,13 +1,22 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
  
 import Task from './Task';
 import { Tasks } from '../api/tasks';
+import AccountsUIWrapper from './AccountUIWrapper';
 
 interface PropsType {
- tasks: { _id: string; text: string; checked: boolean; }[];
- incompleteCount: number;
+  tasks: { 
+    _id: string; 
+    text: string; 
+    checked: boolean;
+    owner: string;
+    username: string;
+  }[];
+  incompleteCount: number;
+  current_user: {};
 }
 
 interface StateType {
@@ -35,6 +44,8 @@ class App extends React.Component<PropsType, StateType> {
       text,
       createdAt: new Date(),
       checked: false, 
+      owner: Meteor.userId(),
+      username: Meteor.user().username, 
     });
     // Clear form
     this.textInput.value = '';
@@ -57,6 +68,7 @@ class App extends React.Component<PropsType, StateType> {
   }
  
   render() {
+    console.log(this.props.tasks);
     return (
       <div className="container">
         <header>
@@ -69,15 +81,18 @@ class App extends React.Component<PropsType, StateType> {
             />
             Hide Completed Tasks
           </label>
- 
 
-          <form className="new-task" onSubmit={this.handleSubmit} >
-            <input
-              type="text"
-              ref={(ref) => this.textInput = ref}
-              placeholder="Type to add new holiday plan!"
-            />
-          </form>
+          <AccountsUIWrapper />
+
+          { this.props.current_user ? 
+            <form className="new-task" onSubmit={this.handleSubmit} >
+              <input
+                type="text"
+                ref={(ref) => this.textInput = ref}
+                placeholder="Type to add new holiday plan!"
+              />
+            </form> : ''
+          }
         </header>
 
         <ul>
@@ -92,5 +107,6 @@ export default createContainer(() => {
   return {
     tasks: Tasks.find({}, { sort: { createdAt: -1 } }).fetch(),
     incompleteCount: Tasks.find({ checked: { $ne: true }}).count(),
+    current_user: Meteor.user(),
   };
 }, App);
