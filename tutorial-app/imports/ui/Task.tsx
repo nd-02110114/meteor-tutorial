@@ -1,6 +1,5 @@
 import * as React from 'react';
-
-import { Tasks } from '../api/tasks';
+import { Meteor } from 'meteor/meteor';
  
 // Task component - represents a single todo item
 interface TaskProps {
@@ -15,13 +14,11 @@ interface TaskProps {
 
 export default class extends React.Component<TaskProps,{}> {  
   toggleChecked = ():void => {
-    Tasks.update(this.props.task._id, {
-      $set: { checked: !this.props.task.checked }, 
-    })
+    Meteor.call('tasks.setChecked', this.props.task._id, !this.props.task.checked);
   }
 
   deleteThisTask = ():void => {
-    Tasks.remove(this.props.task._id);
+    Meteor.call('tasks.remove', this.props.task._id);
   }
 
   render() {

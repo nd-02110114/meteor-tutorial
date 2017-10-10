@@ -38,15 +38,9 @@ class App extends React.Component<PropsType, StateType> {
   handleSubmit = (event: any):void  => {
     event.preventDefault();
     // Find the text field via the React ref
-    const text = this.textInput.value.trim();
+    const text: string = this.textInput.value.trim();
     // insert Database
-    Tasks.insert({
-      text,
-      createdAt: new Date(),
-      checked: false, 
-      owner: Meteor.userId(),
-      username: Meteor.user().username, 
-    });
+    Meteor.call('tasks.insert', text);
     // Clear form
     this.textInput.value = '';
   }
@@ -68,7 +62,6 @@ class App extends React.Component<PropsType, StateType> {
   }
  
   render() {
-    console.log(this.props.tasks);
     return (
       <div className="container">
         <header>
