@@ -1,15 +1,12 @@
 import * as React from 'react';
 import { Meteor } from 'meteor/meteor';
  
+import { TaskType } from './App'
+
 // Task component - represents a single todo item
 interface TaskProps {
-  task: { 
-    _id: string; 
-    text: string; 
-    checked: boolean;
-    owner: string;
-    username: string;
-  }
+  task: TaskType
+  showPrivateButton: boolean;
 }
 
 export default class extends React.Component<TaskProps,{}> {  

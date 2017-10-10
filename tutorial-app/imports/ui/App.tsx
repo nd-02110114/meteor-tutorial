@@ -7,16 +7,20 @@ import Task from './Task';
 import { Tasks } from '../api/tasks';
 import AccountsUIWrapper from './AccountUIWrapper';
 
+
+export interface TaskType {
+  _id: string; 
+  text: string; 
+  checked: boolean;
+  owner: string;
+  username: string;
+  showPrivateButton: boolean;
+}
+
 interface PropsType {
-  tasks: { 
-    _id: string; 
-    text: string; 
-    checked: boolean;
-    owner: string;
-    username: string;
-  }[];
+  tasks: TaskType [];
   incompleteCount: number;
-  current_user: {};
+  currentUser: { _id: string; };
 }
 
 interface StateType {
@@ -56,9 +60,18 @@ class App extends React.Component<PropsType, StateType> {
     if (this.state.hideCompleted) {
       filteredTasks = filteredTasks.filter(task => !task.checked);
     }
-    return filteredTasks.map((task) => (
-      <Task key={task._id} task={task} />
-    ));
+    return filteredTasks.map((task) => {
+      const currentUserId = this.props.currentUser && this.props.currentUser._id;
+      const showPrivateButton: boolean = task.owner === currentUserId;
+ 
+      return (
+        <Task
+          key={task._id}
+          task={task}
+          showPrivateButton={showPrivateButton}
+        />
+      );
+    });
   }
  
   render() {
@@ -77,7 +90,7 @@ class App extends React.Component<PropsType, StateType> {
 
           <AccountsUIWrapper />
 
-          { this.props.current_user ? 
+          { this.props.currentUser ? 
             <form className="new-task" onSubmit={this.handleSubmit} >
               <input
                 type="text"
@@ -88,6 +101,8 @@ class App extends React.Component<PropsType, StateType> {
           }
         </header>
 
+        <span className="list-label">Stock Plan!</span>
+
         <ul>
           {this.renderTasks()}
         </ul>
@@ -97,9 +112,11 @@ class App extends React.Component<PropsType, StateType> {
 }
 
 export default createContainer(() => {
+  Meteor.subscribe('tasks');
+
   return {
     tasks: Tasks.find({}, { sort: { createdAt: -1 } }).fetch(),
     incompleteCount: Tasks.find({ checked: { $ne: true }}).count(),
-    current_user: Meteor.user(),
+    currentUser: Meteor.user(),
   };
 }, App);

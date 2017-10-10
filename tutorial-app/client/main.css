@@ -18,7 +18,10 @@ body {
   }
    
   .container {
-    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    width: 600px; 
+    float: left;
     margin: 0 auto;
     min-height: 100%;
     background: white;
@@ -28,7 +31,7 @@ body {
     background: #d2edf4;
     background-image: linear-gradient(to bottom, #d0edf5, #e1e5f0 100%);
     padding: 20px 15px 15px 15px;
-    position: relative;
+    position: relative; 
   }
    
   #login-buttons {
@@ -108,6 +111,12 @@ body {
    
   .toggle-private {
     margin-left: 5px;
+  }
+
+  .list-label {
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
   }
    
   @media (max-width: 600px) {
