@@ -15,6 +15,7 @@ export interface TaskType {
   owner: string;
   username: string;
   showPrivateButton: boolean;
+  private: boolean;
 }
 
 interface PropsType {

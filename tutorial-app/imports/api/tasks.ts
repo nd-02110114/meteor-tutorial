@@ -6,11 +6,15 @@ import { TaskType } from '../ui/App';
 
 export const Tasks = new Mongo.Collection('tasks');
 
-
 if (Meteor.isServer) {
   // This code only runs on the server
   Meteor.publish('tasks', function tasksPublication() {
-    return Tasks.find();
+    return Tasks.find({
+      $or: [
+        { private: { $ne: true } },
+        { owner: this.userId },
+      ],
+    });
   });
 }
 
@@ -32,11 +36,22 @@ Meteor.methods({
   'tasks.remove'(taskId: string) {
     check(taskId, String);
  
+    const task: TaskType = Tasks.findOne(taskId);
+    if (task.private && task.owner !== Meteor.userId()) {
+      // If the task is private, make sure only the owner can delete it
+      throw new Meteor.Error('not-authorized');
+    }
     Tasks.remove(taskId);
   },
   'tasks.setChecked'(taskId: string, setChecked: boolean) {
     check(taskId, String);
     check(setChecked, Boolean);
+
+    const task: TaskType = Tasks.findOne(taskId);
+    if (task.private && task.owner !== Meteor.userId()) {
+      // If the task is private, make sure only the owner can check it off
+      throw new Meteor.Error('not-authorized');
+    }
  
     Tasks.update(taskId, { $set: { checked: setChecked } });
   },
