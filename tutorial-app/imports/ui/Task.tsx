@@ -24,11 +24,7 @@ export default class extends React.Component<TaskProps,{}> {
   }
 
   render() {
-    const taskClassName = classnames({
-      checked: this.props.task.checked,
-      private: this.props.task.private,
-    });
- 
+    const taskClassName: string = this.props.task.checked ? 'checked' : '';
     
     return (
       <li className={taskClassName}>
