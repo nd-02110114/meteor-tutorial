@@ -6,7 +6,7 @@ import { TaskType } from './App'
 
 // Task component - represents a single todo item
 interface TaskProps {
-  task: TaskType
+  task: TaskType;
   showPrivateButton: boolean;
 }
 
