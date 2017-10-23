@@ -6,7 +6,7 @@ import { createContainer } from 'meteor/react-meteor-data';
 import Task from './Task';
 import { Tasks } from '../api/tasks';
 import AccountsUIWrapper from './AccountUIWrapper';
-
+import '../api/slack';
 
 export interface TaskType {
   _id: string; 
