@@ -2,11 +2,12 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
+import * as d3_select from 'd3-selection';
  
 import Task from './Task';
 import { Tasks } from '../api/tasks';
 import AccountsUIWrapper from './AccountUIWrapper';
-import '../api/slack';
+import '../api/slack.js';
 
 export interface TaskType {
   _id: string; 
