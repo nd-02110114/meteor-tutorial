@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Meteor } from 'meteor/meteor';
-import classnames from 'classnames';
  
 import { TaskType } from './App'
 
