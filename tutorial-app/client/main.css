@@ -118,6 +118,14 @@ body {
     font-size: 2em;
     font-weight: bold;
   }
+
+  div.bar {
+    display: inline-block;
+    width: 20px;
+    height: 75px;  /* この値は D3 によって上書きされます */
+    margin-right: 2px;
+    background-color: teal;
+ }
    
   @media (max-width: 600px) {
     li {
