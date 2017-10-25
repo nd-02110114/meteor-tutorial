@@ -4,7 +4,8 @@ import { render } from "react-dom";
 
 import App from "../imports/ui/App";
 import '../imports/startup/accounts-config';
+import '../imports/api/slack';
 
 Meteor.startup(() => {
-  render(<App />, document.getElementById('render-target'));
+  // render(<App />, document.getElementById('render-target'));
 });
