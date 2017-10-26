@@ -120,18 +120,18 @@ body {
   }
 
   /* for D3 styling */
-  .bar {
-    fill: steelblue;
+  .header {
+    text-align: center;
+    font-size: 2em;
+    padding-top: 30px; 
+    padding-bottom: 30px;
   }
-  
-  .bar:hover {
-    fill: brown;
+
+  .nvd3-svg {
+    padding-right: 50px;
+    width: 1200px !important;; 
   }
-  
-  .axis--x path {
-    display: none;
-  }
-   
+
   @media (max-width: 600px) {
     li {
       padding: 12px 15px;
