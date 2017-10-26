@@ -1,7 +1,7 @@
 import { config } from '../../config'
 import { Template } from 'meteor/templating';
 import * as d3 from 'd3';
-import * as d3_selection from 'd3-selection';
+import * as nv from 'nvd3';
 
 import '../../client/main.html';
 
@@ -19,8 +19,14 @@ interface d3DataType extends channelDataType {
   name: string;
 }
 
-// arrange data
-function setChannelData (data):channelDataType[] { 
+interface formatDataType {
+  key: string;
+  color: string;
+  values: { label: string; value:number; } [];
+}
+
+// get necessary data
+function getData (data):channelDataType[] { 
   const channelData = [];
 
   let reactionCount:number = 0;
@@ -44,7 +50,7 @@ async function getChannelInfo(element:elementType) {
     + '&channel=' + element.id + '&count=500';
   const response = await fetch(getPostUrl); 
   const json = await response.json();
-  const channelData = setChannelData(json.messages);
+  const channelData = getData(json.messages);
   return channelData;
 }
 
@@ -73,86 +79,62 @@ function drawBarGraph () {
   const alldata = getAllChannelInfo();
 
   alldata.then(e => {
-    Promise.all(e).then((d3Data:d3DataType[]): void => {
-      console.log(d3Data);
+    Promise.all(e).then((d3Data:d3DataType[]) => {
+      // arrrange data
+      return formatData(d3Data);
+    }).then((d3FilterData: formatDataType[]):void => {
+      console.log(d3FilterData);
       Template.body.onRendered(function () {
-        d3BarDraw(d3Data);
+        d3BarDraw(d3FilterData);
       });
     });
   });
 };
 
+// Draw Bar Graph
 drawBarGraph();
 
 // draw d3 bar graph  
 function d3BarDraw (d3Data) {
-  const  margin = {top: 40, right: 10, bottom: 30, left: 40},
-  width = 350 - margin.left - margin.right,
-  height = 250 - margin.top - margin.bottom;
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarHorizontalChart()
+        .x(function(d) { return d.label })
+        .y(function(d) { return d.value })
+        .margin({top: 30, right: 20, bottom: 50, left: 175})
+        .showValues(true)           //Show bar value next to each bar.
+        .tooltips(true)             //Show tooltips on hover.
+        .transitionDuration(350)
+        .showControls(true);        //Allow user to switch between "Grouped" and "Stacked" mode.
 
-  const x = d3.scale().ordinal()
-  .rangeRoundBands([0, width], .1);
+    chart.yAxis
+        .tickFormat(d3.format(',.2f'));
 
-  const y = d3.scale().linear()
-  .range([height, 0]);
+    d3.select('svg')
+        .datum(d3Data)
+        .call(chart);
 
-  const xAxis = d3.svg.axis()
-  .scale(x)
-  .orient("bottom");
+    nv.utils.windowResize(chart.update);
 
-  const yAxis = d3.svg.axis()
-  .scale(y)
-  .orient("left")
-  .ticks(10);
+    return chart;
+  });
+}
 
-  const colorCategoryScale = d3.scale().ordinal()
-  .range([ "rgba(255, 255, 255, 0.2)","rgba(255, 255, 255, 0.3)","rgba(255, 255, 255, 0.4)","rgba(255, 255, 255, 0.5)","rgba(255, 255, 255, 0.6)","rgba(255, 255, 255, 0.7)"]);
+function formatData(data) {
+  const filterData = data.filter(function(element){
+    return (element.message > 15);
+  }).sort(function(x, y){
+    return y.message - x.message || y.reaction - x.reaction;
+  });
 
-  const svg = d3_selection.select("#bar-graph").append("svg")
-  .attr("width", width + margin.left + margin.right)
-  .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-  
+  const formatData = [
+    { key:"Message", color:"#d67777", values:[] },
+    { key:"Reaction", color:"#4f99b4", values:[] },
+  ];
 
-  x.domain(d3Data.map(function(d) { return d.name; }));
-  y.domain([0, d3.max(d3Data, function(d) { return d.message; })]);
-  
-  svg.append("g")
-  .attr("class", "x axis")
-  .style("fill", "#FFF")
-  .attr("transform", "translate(0," + height + ")")
-  .call(xAxis);
+  filterData.forEach(val => {
+    formatData[0].values.push({ label: val.name, value: val.message });
+    formatData[1].values.push({ label: val.name, value: val.reaction });
+  })
 
-  svg.append("g")
-  .attr("class", "y axis")
-  .style("fill", "#FFF")
-  .call(yAxis)
-  .append("text")
-  .attr("transform", "rotate(-90)")
-  .attr("y", 6)
-  .attr("dy", ".71em")
-  .style("text-anchor", "end");
-  //  .text("Frequency")
-
-  svg.selectAll("#bar-graph")
-  .data(d3Data)
-  .enter().append("rect")
-  .attr("class", "bar")
-  .attr("x", function(d) { return x(d.name); })
-  .attr("width", x.rangeBand())
-  .attr("height", 0) // 1 アニメーション前の設定値
-  .attr("y", function(d) { return height; }) // 1 アニメーション前の設定値
-  // .attr("fill", function(d){ return colorCategoryScale(d["level"]); })
-  .transition()
-  .delay(function (d, i) { return i * 100; })
-  .duration(1000)
-  .ease("linear") // bounceの動きを指定する
-  .attr("y", function(d) { return y(d.message); }) // 2 設定値
-  .attr("height", function(d) { return height - y(d.message); }); // 2 設定値
-
-  function type(d) {
-    d.frequency = +d.frequency;
-    return d;
-  }
+  return formatData;
 }

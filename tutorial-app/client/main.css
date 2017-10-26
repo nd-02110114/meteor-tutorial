@@ -119,13 +119,18 @@ body {
     font-weight: bold;
   }
 
-  div.bar {
-    display: inline-block;
-    width: 20px;
-    height: 75px;  /* この値は D3 によって上書きされます */
-    margin-right: 2px;
-    background-color: teal;
- }
+  /* for D3 styling */
+  .bar {
+    fill: steelblue;
+  }
+  
+  .bar:hover {
+    fill: brown;
+  }
+  
+  .axis--x path {
+    display: none;
+  }
    
   @media (max-width: 600px) {
     li {
