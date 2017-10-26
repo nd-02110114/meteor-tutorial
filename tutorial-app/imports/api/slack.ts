@@ -8,6 +8,7 @@ import '../../client/main.html';
 // type declare
 interface elementType {
   id: string
+  name:string;
 }
 
 interface channelDataType {
@@ -73,7 +74,7 @@ async function getAllChannelInfo() {
   }
 };
 
-// formatting
+// formatting data
 function formatData(data) {
   const filterData = data.filter(function(element){
     return (element.message > 15);
@@ -121,7 +122,6 @@ function d3BarDraw (d3Data) {
 
 // draw d3 graph
 function drawBarGraph () {
-  const a = ["test", "hoge", "hello d3"]
   const alldata = getAllChannelInfo();
 
   alldata.then(e => {
