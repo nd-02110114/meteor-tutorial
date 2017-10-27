@@ -9,7 +9,7 @@ import '../../client/main.html';
 // type declare
 interface elementType {
   id: string
-  name:string;
+  name: string;
 }
 
 interface channelDataType {
@@ -33,6 +33,9 @@ interface d3LineDataType {
   data: number[];
   tension: number;
   borderColor: string;
+  fill: boolean;
+  pointRadius: number;
+  pointBackgroundColor: string;
 }
 
 // get necessary data
@@ -129,7 +132,15 @@ function formatData(data) {
       data.unshift(element.value);
     });
     if (val.message > 50) {
-      datasets.push({ label: val.name, data: data,tension: 0, borderColor: colors[i] });
+      datasets.push({ 
+        label: val.name, 
+        data: data,
+        tension: 0, 
+        borderColor: colors[i],
+        fill: false,
+        pointRadius: 5,
+        pointBackgroundColor: "#fff" 
+      });
     }
 
     /* For Bar chart */
@@ -165,7 +176,8 @@ function d3BarDraw (d3Data) {
 }
 
 function chartJSLineDraw (d3Data) {
-  const ctx = document.getElementById("lineChart").getContext('2d');
+  const canvas = <HTMLCanvasElement> document.getElementById('lineChart');
+  const ctx = canvas.getContext("2d");
   new Chart(ctx, {
     type: 'line',
     data: d3Data,
@@ -180,7 +192,7 @@ function chartJSLineDraw (d3Data) {
           display: true,
           fontColor: 'black',
           fontSize: 30,
-          text: 'Each Channel Message Count'
+          text: 'Channel Message Count'
       }     ,
       scales: {
           yAxes: [{
@@ -194,9 +206,8 @@ function chartJSLineDraw (d3Data) {
                   fontColor: 'black'
               },
           }]
-      } 
-
-  }
+      }
+    }
   });
 };
 
