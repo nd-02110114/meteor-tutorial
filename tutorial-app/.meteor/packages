@@ -25,3 +25,5 @@ accounts-password
 practicalmeteor:mocha
 d3js:d3
 nvd3:nvd3
+momentjs:moment
+chart:chart

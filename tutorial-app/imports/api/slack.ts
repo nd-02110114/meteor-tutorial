@@ -1,7 +1,8 @@
 import { config } from '../../config'
-import { Template } from 'meteor/templating';
 import * as d3 from 'd3';
 import * as nv from 'nvd3';
+import * as moment from 'moment';
+import * as Chart from 'chart.js'
 
 import '../../client/main.html';
 
@@ -14,16 +15,24 @@ interface elementType {
 interface channelDataType {
   reaction: number;
   message: number;
+  weeklyCount: { label: string; value:number; } []; 
 }
 
 interface d3DataType extends channelDataType {
   name: string;
 }
 
-interface formatDataType {
+interface d3BarDataType {
   key: string;
   color: string;
   values: { label: string; value:number; } [];
+}
+
+interface d3LineDataType {
+  label: string;
+  data: number[];
+  tension: number;
+  borderColor: string;
 }
 
 // get necessary data
@@ -32,6 +41,22 @@ function getData (data):channelDataType[] {
 
   let reactionCount:number = 0;
   const messageCount:number = data.length;
+  const messageWeeklyCount = [];
+
+  let startDay = moment();
+  let count = 0;
+  for (let i = 0; i < 15; i++){
+    let endDay = moment().subtract(7 * (i+1), 'days');
+    messageWeeklyCount.push({label: startDay.format('YYYY/MM/DD'), value: messageCount - count});
+    data.forEach(element => {
+      let postDate = moment.unix(element.ts);
+      if (postDate.isBetween(endDay, startDay)){
+        count++;
+      }
+    });
+    startDay = endDay;
+  }
+
   data.forEach(element => {
     if (element.reactions !== undefined) {
       element.reactions.forEach(value => {
@@ -42,6 +67,7 @@ function getData (data):channelDataType[] {
 
   channelData['reaction'] = reactionCount;
   channelData['message'] = messageCount;
+  channelData['weeklyCount'] = messageWeeklyCount;
   return channelData;
 }
 
@@ -82,17 +108,39 @@ function formatData(data) {
     return y.message - x.message || y.reaction - x.reaction;
   });
 
-  const formatData = [
+  const formatDataForBar: d3BarDataType[] = [
     { key:"Message", color:"#d67777", values:[] },
     { key:"Reaction", color:"#4f99b4", values:[] },
   ];
 
-  filterData.forEach(val => {
-    formatData[0].values.push({ label: val.name, value: val.message });
-    formatData[1].values.push({ label: val.name, value: val.reaction });
+  const formatDataForLine = [];
+  const labels: string[] = [];
+  const datasets: d3LineDataType[] = [];
+  const colors = ['#F44336','#E91E63','#9C27B0','#673AB7','#3F51B5','#2196F3','#00BCD4',
+        '#009688','#4CAF50','#8BC34A','#CDDC39','#FFEB3B','#FF9800','#FF5722','#795548','#9E9E9E'];
+
+  filterData.forEach((val,i) => {
+    /* For Line chart */
+    let data: number[] = [];
+    val.weeklyCount.forEach(element => {
+      if (labels.indexOf(element.label) == -1) {
+        labels.unshift(element.label);
+      }
+      data.unshift(element.value);
+    });
+    if (val.message > 50) {
+      datasets.push({ label: val.name, data: data,tension: 0, borderColor: colors[i] });
+    }
+
+    /* For Bar chart */
+    formatDataForBar[0].values.push({ label: val.name, value: val.message });
+    formatDataForBar[1].values.push({ label: val.name, value: val.reaction });
   })
 
-  return formatData;
+  formatDataForLine['labels'] = labels;
+  formatDataForLine['datasets'] = datasets;
+
+  return [formatDataForBar, formatDataForLine];
 }
 
 // draw d3 bar graph  
@@ -106,7 +154,7 @@ function d3BarDraw (d3Data) {
     chart.yAxis
         .tickFormat(d3.format("01d"));
 
-    d3.select('svg')
+    d3.select('#bar-graph svg')
         .datum(d3Data)
         .call(chart);
 
@@ -116,6 +164,14 @@ function d3BarDraw (d3Data) {
   });
 }
 
+function chartJSLineDraw (d3Data) {
+  const ctx = document.getElementById("lineChart").getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: d3Data,
+  });
+};
+
 // draw d3 graph
 function drawBarGraph () {
   const alldata = getAllChannelInfo();
@@ -124,9 +180,10 @@ function drawBarGraph () {
     Promise.all(e).then((d3Data:d3DataType[]) => {
       // arrrange data
       return formatData(d3Data);
-    }).then((d3FilterData: formatDataType[]):void => {
-      // draw nvd3
-      d3BarDraw(d3FilterData);
+    }).then((d3FilterData):void => {
+      // draw many graph
+      d3BarDraw(d3FilterData[0]);
+      chartJSLineDraw(d3FilterData[1]);
     });
   });
 };
