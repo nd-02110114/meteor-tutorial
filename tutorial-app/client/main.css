@@ -133,6 +133,13 @@ body {
     height: 800px !important;
   }
 
+  #lineChart {
+    width: 1200px !important; 
+    height: 800px !important;
+    padding-left: 50px; 
+    padding-bottom: 100px;
+  }
+
   @media (max-width: 600px) {
     li {
       padding: 12px 15px;

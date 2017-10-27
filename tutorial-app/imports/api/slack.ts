@@ -169,6 +169,34 @@ function chartJSLineDraw (d3Data) {
   new Chart(ctx, {
     type: 'line',
     data: d3Data,
+    options: {
+      legend: {
+           labels: {
+                fontColor: 'black',
+                fontSize: 20,
+               }
+            },
+      title: {
+          display: true,
+          fontColor: 'black',
+          fontSize: 30,
+          text: 'Each Channel Message Count'
+      }     ,
+      scales: {
+          yAxes: [{
+              ticks: {
+                  beginAtZero:true,
+                  fontColor: 'black'
+              },
+          }],
+        xAxes: [{
+              ticks: {
+                  fontColor: 'black'
+              },
+          }]
+      } 
+
+  }
   });
 };
 
