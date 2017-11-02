@@ -48,15 +48,16 @@ function getData (data):channelDataType[] {
 
   let startDay = moment();
   let count = 0;
+  messageWeeklyCount.push({label: startDay.format('YYYY/MM/DD'), value: messageCount - count});
   for (let i = 0; i < 15; i++){
-    let endDay = moment().subtract(7 * (i+1), 'days');
-    messageWeeklyCount.push({label: startDay.format('YYYY/MM/DD'), value: messageCount - count});
+    let endDay = moment().day(1).subtract(7 * i, 'days');
     data.forEach(element => {
       let postDate = moment.unix(element.ts);
       if (postDate.isBetween(endDay, startDay)){
         count++;
       }
     });
+    messageWeeklyCount.push({label: endDay.format('YYYY/MM/DD') + '~', value: messageCount - count});
     startDay = endDay;
   }
 
